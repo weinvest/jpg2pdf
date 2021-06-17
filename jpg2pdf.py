@@ -1,5 +1,5 @@
 #coding=utf-8
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 convert image to pdf file
@@ -12,14 +12,15 @@ import glob
 import platform 
 
 from reportlab.lib.pagesizes import letter, A4, landscape  
-from reportlab.platypus import SimpleDocTemplate, Image  
+from reportlab.platypus import SimpleDocTemplate
 from reportlab.lib.units import inch  
 from reportlab.pdfgen import canvas
 from reportlab import rl_settings
 
-import Image
-reload(sys)
-sys.setdefaultencoding("utf-8")
+from PIL import Image
+
+import importlib
+importlib.reload(sys)
 
 def topdf(path,recursion=None,pictureType=None,sizeMode=None,width=None,height=None,fit=None,save=None):
     """
@@ -55,12 +56,12 @@ def topdf(path,recursion=None,pictureType=None,sizeMode=None,width=None,height=N
     save : string 
            path to save the pdf 
     """
-    print path
+    print(path)
     if platform.system() == 'Windows':
         path = path.replace('\\','/')
     if path[-1] != '/':
         path = (path + '/')
-    print path
+    print(path)
     if recursion == True:
         for i in os.listdir(path):
             if os.path.isdir(os.path.abspath(os.path.join(path, i))):
@@ -76,7 +77,7 @@ def topdf(path,recursion=None,pictureType=None,sizeMode=None,width=None,height=N
     maxh = 0
     if sizeMode == None or sizeMode == 0:
         for i in filelist:
-            print '----',i
+            print(f'----,{i}')
             im = Image.open(i)
             if maxw < im.size[0]:
                 maxw = im.size[0]
@@ -102,14 +103,14 @@ def topdf(path,recursion=None,pictureType=None,sizeMode=None,width=None,height=N
         filename_pdf = path + path.split('/')[-2]
     else:
         filename_pdf = save + path.split('/')[-2]
-    filename_pdf = filename_pdf.decode('utf8','ignore')
+    #filename_pdf = filename_pdf.decode('utf8','ignore')
     filename_pdf = filename_pdf + '.pdf'
-    print filename_pdf
+    print(filename_pdf)
     c = canvas.Canvas(filename_pdf, pagesize=maxsize )
      
     l = len(filelist)
     for i in range(l): 
-        print filelist[i] 
+        print(filelist[i])
         (w, h) =maxsize
         width, height = letter 
         if fit == True:
@@ -118,10 +119,19 @@ def topdf(path,recursion=None,pictureType=None,sizeMode=None,width=None,height=N
             c.drawImage(filelist[i] , 0,0,maxw,maxh) 
         c.showPage()  
     c.save()      
-    print "end."  
-
-def main():
-    topdf(u'G:/R/jpg2pdf/test/新建文件夹',pictureType=['png','jpg'],save='G:/R/jpg2pdf/')
+    print("end.")
 
 if __name__ == '__main__':
-    main()
+    import argparse
+    parser=argparse.ArgumentParser(description="img2pdf")
+    parser.add_argument('-s', '--source_dir', help='where the source pictures in')
+    parser.add_argument('-t', '--pict_types', type=str, nargs='+', help='pict_types, eg: png,jpg,etc')
+    parser.add_argument('-m', '--size_mode', default=0, type=int, help='''size mode: 0 the biggest of all the pictures
+           1 the min of all the pictures
+           2 the given value of width and height''')
+    parser.add_argument('-W', '--width', type=int, default=0, help='only needed when size_mode = 2')
+    parser.add_argument('-H', '--height', type=int, default=0, help='only needed when size_mode = 2')
+    args = parser.parse_args(sys.argv[1:]) 
+    print(args.pict_types)
+    topdf(args.source_dir, pictureType=args.pict_types, save=args.source_dir, sizeMode=args.size_mode, width=args.width, height=args.height)
+
