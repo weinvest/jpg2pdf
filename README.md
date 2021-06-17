@@ -42,6 +42,10 @@ fit : boolean
 save : string 
        path to save the pdf 
 
-#TODO
 
-* a better gui
+
+usage:
+1. jpg2pdf.py -s test -t png jpg
+2. jpg2pdf.py -s test -t png jpg -m 0
+3. jpg2pdf.py -s test -t png jpg -m 1
+4. jpg2pdf.py -s test -t png jpg -m 2 -W 210 -H 297
